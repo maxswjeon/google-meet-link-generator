@@ -104,3 +104,41 @@ export type CalendarListResource = {
     allowedConferenceSolutionTypes: [string];
   };
 };
+
+export type IPAUserFindResponse = {
+  result: {
+    result: {
+      cn: string[];
+      displayname: string[];
+      initials: string[];
+      gecos: string[];
+      objectclass: string[];
+      ipauniqueid: string[];
+      mepmanagedentry: string[];
+      ipantsecurityidentifier: string[];
+      employeenumber: string[];
+      departmentnumber: string[];
+      uidnumber: string[];
+      uid: string[];
+      homedirectory: string[];
+      sn: string[];
+      mail: string[];
+      gidnumber: string[];
+      krbcanonicalname: string[];
+      krbprincipalname: string[];
+      givenname: string[];
+      loginshell: string[];
+      nsaccountlock: boolean;
+      preserved: boolean;
+      memberof_group: string[];
+      dn: string;
+    }[];
+    count: number;
+    truncated: boolean;
+    summary: string;
+  };
+  error: unknown;
+  id: number;
+  principal: string;
+  version: string;
+};

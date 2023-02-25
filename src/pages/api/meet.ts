@@ -2,14 +2,21 @@ import axios from "axios";
 import * as JWT from "jose";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
-import { authOptions } from "./auth/[...nextauth]";
-
 import {
   CalendarListResource,
   CalendarListResponse,
   CreateCalendarEventResponse,
+  IPAUserFindResponse,
 } from "types/Response";
+import { authOptions } from "./auth/[...nextauth]";
+
 import CREDENTIALS from "../../../credentials.json";
+
+function encodeCookies(cookies: Record<string, string>) {
+  return Object.keys(cookies)
+    .map((key) => `${key}=${cookies[key]}`)
+    .join("; ");
+}
 
 export default async function MeetLinkGenerate(
   req: NextApiRequest,
@@ -41,6 +48,33 @@ export default async function MeetLinkGenerate(
       res.status(400).end();
       return;
     }
+
+    const { data: ipaUser } = await axios.post<IPAUserFindResponse>(
+      `${process.env.IPA_SERVER_URL}/ipa/session/json`,
+      {
+        id: 0,
+        method: "user_find",
+        params: [
+          [null],
+          {
+            all: true,
+            raw: false,
+            version: "2.251",
+            mail: [userMail],
+          },
+        ],
+      },
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Cookie: encodeCookies({
+            ipa_session: process.env.IPA_SERVER_COOKIE,
+          }),
+          Referer: `${process.env.IPA_SERVER_URL}/ipa`,
+        },
+      }
+    );
 
     const key = await JWT.importPKCS8(CREDENTIALS.private_key, "RS256");
 
@@ -153,15 +187,111 @@ export default async function MeetLinkGenerate(
       `Successfully created event - ${data.id} (${data.conferenceData.conferenceId})`
     );
 
-    const { data: meetData } = await axios.post(
-      `https://calendar-pa.clients6.google.com/v1/meeting/${data.conferenceData.conferenceId}/calendar/${process.env.GOOGLE_CLIENT_EMAIL}}/settings?alt=protojson&key=${process.env.GOOGLE_API_KEY}`,
-      {},
+    const { data: meetSettingsData } = await axios.get(
+      `https://calendar-pa.clients6.google.com/v1/meeting/${data.conferenceData.conferenceId}/calendar/${calendarId}/settings?alt=protojson&key=AIzaSyAJV0pH9dpVwdNZeLajIGsIpjcPu3tVgAE`,
       {
         headers: {
-          Authorization: `Bearer ${access_token}`,
+          Authorization: `SAPISIDHASH ${process.env.GOOGLE_ADMIN_SAPISID_HASH}`,
+          "Content-Type": "application/json+protobuf",
+          "X-Origin": "https://calendar.google.com",
+          "X-Goog-Authuser": process.env.GOOGLE_ADMIN_AUTHUSER,
+          Cookie: encodeCookies({
+            SID: process.env.GOOGLE_ADMIN_SID,
+            HSID: process.env.GOOGLE_ADMIN_HSID,
+            SSID: process.env.GOOGLE_ADMIN_SSID,
+            APISID: process.env.GOOGLE_ADMIN_APISID,
+            SAPISID: process.env.GOOGLE_ADMIN_SAPISID,
+          }),
         },
       }
     );
+
+    const spaceId = meetSettingsData[1][0];
+    console.log(`Found space ID - ${spaceId}`);
+
+    const { data: meetData } = await axios.post(
+      `https://calendar-pa.clients6.google.com/v1/meeting/${data.conferenceData.conferenceId}/calendar/${calendarId}/settings?alt=protojson&key=AIzaSyAJV0pH9dpVwdNZeLajIGsIpjcPu3tVgAE`,
+      [
+        data.conferenceData.conferenceId,
+        calendarId,
+        [
+          spaceId,
+          data.conferenceData.conferenceId,
+          null,
+          null,
+          [],
+          null,
+          null,
+          null,
+          null,
+          null,
+          [],
+          null,
+          [],
+          null,
+          [null, null, null, null, true, null, null, true],
+        ],
+        [
+          [
+            "settings.moderation_enabled",
+            "settings.cohost_artifact_sharing_enabled",
+            "cohost_config",
+          ],
+        ],
+        true,
+        [
+          [
+            ["localId_5834079313", "소그룹 세션 1", null, []],
+            ["localId_9296729851", "소그룹 세션 2", null, []],
+          ],
+        ],
+        [
+          [
+            spaceId,
+            data.conferenceData.conferenceId,
+            null,
+            null,
+            [],
+            null,
+            null,
+            null,
+            null,
+            null,
+            [],
+            null,
+            [],
+            null,
+            [null, null, null, null, true, null, null, true],
+          ],
+          [
+            [
+              ["localId_5834079313", "소그룹 세션 1", null, []],
+              ["localId_9296729851", "소그룹 세션 2", null, []],
+            ],
+          ],
+          [[ipaUser.result.result[0].departmentnumber[0]], []],
+          null,
+          [],
+        ],
+      ],
+      {
+        headers: {
+          Authorization: `SAPISIDHASH ${process.env.GOOGLE_ADMIN_SAPISID_HASH}`,
+          "Content-Type": "application/json+protobuf",
+          "X-Origin": "https://calendar.google.com",
+          "X-Goog-Authuser": process.env.GOOGLE_ADMIN_AUTHUSER,
+          Cookie: encodeCookies({
+            SID: process.env.GOOGLE_ADMIN_SID,
+            HSID: process.env.GOOGLE_ADMIN_HSID,
+            SSID: process.env.GOOGLE_ADMIN_SSID,
+            APISID: process.env.GOOGLE_ADMIN_APISID,
+            SAPISID: process.env.GOOGLE_ADMIN_SAPISID,
+          }),
+        },
+      }
+    );
+
+    console.log("Successfully updated meet settings");
 
     return res.status(200).json(data);
   } catch (e) {
