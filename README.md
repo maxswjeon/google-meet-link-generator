@@ -99,12 +99,12 @@ Since the [Google Calendar](https://calendar.google.com/) is using Private API t
 
 Send a request to FreeIPA to get a token.
 
-    - URL: `https://<your FreeIPA server>/ipa/session/login_password`
-    - Method: `POST`
-    - Headers:
-      - `Accept`: `text/plain`
-      - `Content-Type`: `application/x-www-form-urlencoded`
-      - `Referer`: `https://<your FreeIPA server>/ipa/session/login_password`
+- URL: `https://<your FreeIPA server>/ipa/session/login_password`
+- Method: `POST`
+- Headers:
+  - `Accept`: `text/plain`
+  - `Content-Type`: `application/x-www-form-urlencoded`
+  - `Referer`: `https://<your FreeIPA server>/ipa/session/login_password`
 
 Copy `ipa_session` cookie value from the response and put it to the `IPA_SESSION_COOKIE` environment variable.
 
@@ -120,27 +120,27 @@ Add a new client to Keycloak, and set the following values. - KEYCLOAK_CLIENT_ID
 
 Put these environment variables to the `.env` file.
 
-    - next-auth related
-        - `NEXTAUTH_URL`: The URL of your application
-        - `NEXTAUTH_SECRET`: A secret string. Recommended to use `openssl rand -hex 32`
-    - Keycloak related
-        - `KEYCLOAK_CLIENT_ID`: The client ID of the client you created in Keycloak
-        - `KEYCLOAK_CLIENT_SECRET`: The client secret of the client you created in Keycloak
-        - `KEYCLOAK_ISSUER`: The issuer URL of your Keycloak server. (e.g. `https://<your Keycloak server>/auth/realms/<your realm name>`)
-    - Google API related (For Public APIs, Legit)
-        - `GOOGLE_API_KEY`: The API key you created in Google Cloud Console
-        - `GOOGLE_CLIENT_EMAIL`: The email address of the Google Workspace owner. **All the meetings will be created by this account.**
-    - Google API related (For Private APIs, Not Legit)
-        - `GOOGLE_ADMIN_SID`: The SID value of the cookie you got from Google Calendar
-        - `GOOGLE_ADMIN_HSID`: The HSID value of the cookie you got from Google Calendar
-        - `GOOGLE_ADMIN_SSID`: The SSID value of the cookie you got from Google Calendar
-        - `GOOGLE_ADMIN_APISID`: The APISID value of the cookie you got from Google Calendar
-        - `GOOGLE_ADMIN_SAPISID`: The SAPISID value of the cookie you got from Google Calendar
-        - `GOOGLE_ADMIN_SAPISID_HASH`: The hash value after the SAPISIDHASH in the Authorization header you got from Google Calendar
-        - `GOOGLE_ADMIN_AUTHUSER`: The x-goog-authuser value of the request you got from Google Calendar
-    - FreeIPA Server related
-        - `IPA_SERVER_URL`: The URL of your FreeIPA server
-        - `IPA_SERVER_COOKIE`: The `ipa_session` cookie value you got from FreeIPA
+- next-auth related
+  - `NEXTAUTH_URL`: The URL of your application
+  - `NEXTAUTH_SECRET`: A secret string. Recommended to use `openssl rand -hex 32`
+- Keycloak related
+  - `KEYCLOAK_CLIENT_ID`: The client ID of the client you created in Keycloak
+  - `KEYCLOAK_CLIENT_SECRET`: The client secret of the client you created in Keycloak
+  - `KEYCLOAK_ISSUER`: The issuer URL of your Keycloak server. (e.g. `https://<your Keycloak server>/auth/realms/<your realm name>`)
+- Google API related (For Public APIs, Legit)
+  - `GOOGLE_API_KEY`: The API key you created in Google Cloud Console
+  - `GOOGLE_CLIENT_EMAIL`: The email address of the Google Workspace owner. **All the meetings will be created by this account.**
+- Google API related (For Private APIs, Not Legit)
+  - `GOOGLE_ADMIN_SID`: The SID value of the cookie you got from Google Calendar
+  - `GOOGLE_ADMIN_HSID`: The HSID value of the cookie you got from Google Calendar
+  - `GOOGLE_ADMIN_SSID`: The SSID value of the cookie you got from Google Calendar
+  - `GOOGLE_ADMIN_APISID`: The APISID value of the cookie you got from Google Calendar
+  - `GOOGLE_ADMIN_SAPISID`: The SAPISID value of the cookie you got from Google Calendar
+  - `GOOGLE_ADMIN_SAPISID_HASH`: The hash value after the SAPISIDHASH in the Authorization header you got from Google Calendar
+  - `GOOGLE_ADMIN_AUTHUSER`: The x-goog-authuser value of the request you got from Google Calendar
+- FreeIPA Server related
+  - `IPA_SERVER_URL`: The URL of your FreeIPA server
+  - `IPA_SERVER_COOKIE`: The `ipa_session` cookie value you got from FreeIPA
 
 ## Usage
 
