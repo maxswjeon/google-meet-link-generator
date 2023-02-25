@@ -133,3 +133,13 @@ Put these environment variables to the `.env` file.
 ```bash
 docker compose up -d
 ```
+
+## Customization
+
+### 1. Change the logo and the favicon
+
+Change the asset in `public/` folder
+
+### 2. Change the GitHub Repo
+
+Set the `GITHUB_REPO` environment variable.

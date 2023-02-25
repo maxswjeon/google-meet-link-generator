@@ -3,10 +3,12 @@ import {
   Button,
   Center,
   Checkbox,
+  Divider,
   FormControl,
   FormLabel,
   Heading,
   Input,
+  Link,
   ListItem,
   Text,
   UnorderedList,
@@ -20,7 +22,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { CreateCalendarEventResponse } from "types/Response";
 
-import logo from "~/logo.png";
+import GitHub from "assets/github.png";
 
 type FormValues = {
   name: string;
@@ -93,7 +95,7 @@ export default function MainPage() {
         shadow="xl"
         rounded="xl"
       >
-        <Image src={logo} alt="YCC Logo" w="full" h="auto" />
+        <Image src="/logo.png" alt="YCC Logo" width="432" height="216" />
         <Heading as="h1" textAlign="center">
           Google Meet Link Generator
         </Heading>
@@ -187,6 +189,26 @@ export default function MainPage() {
             다른 회의 생성
           </Button>
         </Box>
+        <Divider w="full" />
+        <Link
+          display="flex"
+          href={`https://github.com/${
+            process.env.GITHUB_REPO || "maxswjeon/google-meet-generator"
+          }`}
+          isExternal
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Image
+            src={GitHub}
+            width="16px"
+            height="16px"
+            alt="GitHub Logo"
+            display="inline"
+            mr="1"
+          />
+          {process.env.GITHUB_REPO || "maxswjeon/google-meet-generator"}
+        </Link>
       </Center>
     </Center>
   );
