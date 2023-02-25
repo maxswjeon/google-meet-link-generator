@@ -18,6 +18,7 @@ import { signIn, useSession } from "next-auth/react";
 import Head from "next/head";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { CreateCalendarEventResponse } from "types/Response";
 
 import logo from "~/logo.png";
 
@@ -39,20 +40,24 @@ export default function MainPage() {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { isSubmitting },
   } = useForm<FormValues>();
 
   const onSubmit = handleSubmit(async (formData) => {
     try {
       const repeatEnd = new Date(formData.repeatEnd || "1970-01-01");
-      const repeatEndString = `${repeatEnd.getFullYear()}-${repeatEnd.getMonth()}-${repeatEnd.getDate()}`;
 
-      const { data } = await axios.post("/api/meet", {
-        start: new Date(formData.start).toISOString(),
-        name: formData.name,
-        repeat: formData.repeat,
-        repeatEnd: formData.repeat ? repeatEndString : undefined,
-      });
+      const { data } = await axios.post<CreateCalendarEventResponse>(
+        "/api/meet",
+        {
+          start: new Date(formData.start).toISOString(),
+          name: formData.name,
+          repeatEnd: formData.repeat ? repeatEnd.toISOString() : undefined,
+        }
+      );
+
+      setLink(`https://meet.google.com/${data.conferenceData.conferenceId}`);
     } catch (e: unknown) {
       if (!(axios.isAxiosError(e) && e.response)) {
         console.log(e);
@@ -120,7 +125,7 @@ export default function MainPage() {
           w="full"
           gap="3"
           flexDir="column"
-          display={status === "authenticated" ? "flex" : "none"}
+          display={status === "authenticated" && !link ? "flex" : "none"}
           onSubmit={onSubmit}
         >
           <FormControl isRequired>
@@ -145,6 +150,41 @@ export default function MainPage() {
             isLoading={isSubmitting}
           >
             생성
+          </Button>
+        </Box>
+        <Box w="full" gap="3" flexDir="column" display={link ? "flex" : "none"}>
+          <Heading as="h3" size="md" textAlign="center">
+            성공적으로 회의를 생성했습니다
+          </Heading>
+          <Box>
+            <Input
+              w="full"
+              bgColor="blackAlpha.300"
+              readOnly
+              value={link}
+              textAlign="center"
+              onClick={() => {
+                navigator.clipboard.writeText(link);
+                toast({
+                  title: "링크 복사됨",
+                  description: "클립보드에 링크가 복사되었습니다",
+                  status: "success",
+                });
+              }}
+            />
+            <Text color="blackAlpha.700" textAlign="end">
+              클릭하여 복사하세요!
+            </Text>
+          </Box>
+          <Button
+            w="full"
+            colorScheme="blue"
+            onClick={() => {
+              setLink("");
+              reset();
+            }}
+          >
+            다른 회의 생성
           </Button>
         </Box>
       </Center>

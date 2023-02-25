@@ -18,6 +18,8 @@ function encodeCookies(cookies: Record<string, string>) {
     .join("; ");
 }
 
+const WEEKDAYS = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+
 export default async function MeetLinkGenerate(
   req: NextApiRequest,
   res: NextApiResponse
@@ -43,7 +45,7 @@ export default async function MeetLinkGenerate(
       return;
     }
 
-    const { name, start, repeat, repeatEnd } = req.body;
+    const { name, start, repeatEnd } = req.body;
     if (!(name && start)) {
       res.status(400).end();
       return;
@@ -151,15 +153,27 @@ export default async function MeetLinkGenerate(
 
     console.log(`Found calendar for user - ${calendarId}`);
 
+    const untilDate = repeatEnd
+      ? `${
+          new Date(+new Date(repeatEnd) + 15 * 60 * 60 * 1000)
+            .toISOString()
+            .replaceAll("-", "")
+            .replaceAll(":", "")
+            .split(".")[0]
+        }Z`
+      : undefined;
+
     const { data } = await axios.post<CreateCalendarEventResponse>(
       `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?conferenceDataVersion=1&sendUpdates=all`,
       {
         summary: name,
         start: {
           dateTime: start,
+          timeZone: "Asia/Seoul",
         },
         end: {
           dateTime: new Date(+new Date(start) + 60 * 60 * 1000).toISOString(),
+          timeZone: "Asia/Seoul",
         },
         attendees: [
           {
@@ -175,6 +189,9 @@ export default async function MeetLinkGenerate(
             requestId: `ycc-study-${Math.random()}`,
           },
         },
+        recurrence: repeatEnd
+          ? [`RRULE:FREQ=WEEKLY;UNTIL=${untilDate}`]
+          : undefined,
       },
       {
         headers: {
