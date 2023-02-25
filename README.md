@@ -93,7 +93,7 @@ Since the [Google Calendar](https://calendar.google.com/) is using Private API t
 
     > **Note**
     >
-    > The GOOGLE_ADMIN_SAPISID_HASH should not contain SAPISIDHASH, but only the hash value.
+    > The GOOGLE_ADMIN_SAPISID_HASH should not contain `SAPISIDHASH`, but only the hash value.
 
 ### 3. Set up Keycloak
 
@@ -115,7 +115,7 @@ Put these environment variables to the `.env` file.
 - Keycloak related
   - `KEYCLOAK_CLIENT_ID`: The client ID of the client you created in Keycloak
   - `KEYCLOAK_CLIENT_SECRET`: The client secret of the client you created in Keycloak
-  - `KEYCLOAK_ISSUER`: The issuer URL of your Keycloak server. (e.g. `https://<your Keycloak server>/auth/realms/<your realm name>`)
+  - `KEYCLOAK_ISSUER`: The issuer URL of your Keycloak server. (e.g. `https://<your Keycloak server>/realms/<your realm name>`)
 - Google API related (For Public APIs, Legit)
   - `GOOGLE_API_KEY`: The API key you created in Google Cloud Console
   - `GOOGLE_CLIENT_EMAIL`: The email address of the Google Workspace owner. **All the meetings will be created by this account.**
