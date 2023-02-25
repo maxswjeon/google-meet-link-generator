@@ -95,28 +95,17 @@ Since the [Google Calendar](https://calendar.google.com/) is using Private API t
     >
     > The GOOGLE_ADMIN_SAPISID_HASH should not contain SAPISIDHASH, but only the hash value.
 
-### 3. Get credentials from FreeIPA and set up FreeIPA
+### 3. Set up Keycloak
 
-Send a request to FreeIPA to get a token.
+Add a new client to Keycloak, and set the following values.
 
-- URL: `https://<your FreeIPA server>/ipa/session/login_password`
-- Method: `POST`
-- Headers:
-  - `Accept`: `text/plain`
-  - `Content-Type`: `application/x-www-form-urlencoded`
-  - `Referer`: `https://<your FreeIPA server>/ipa/session/login_password`
+- KEYCLOAK_CLIENT_ID
+- KEYCLOAK_CLIENT_SECRET
+- KEYCLOAK_ISSUER: `https://<your Keycloak server>/auth/realms/<your realm name>`
 
-Copy `ipa_session` cookie value from the response and put it to the `IPA_SESSION_COOKIE` environment variable.
+Map required user attributes to the client (especially Google account ID).
 
-> **Warning**
->
-> The FreeIPA user should have their `Google Account ID` set in the `departmentNumber` field.
-
-### 4. Set up Keycloak
-
-Add a new client to Keycloak, and set the following values. - KEYCLOAK_CLIENT_ID - KEYCLOAK_CLIENT_SECRET - KEYCLOAK_ISSUER: `https://<your Keycloak server>/auth/realms/<your realm name>`
-
-### 5. Set up the application
+### 4. Set up the application
 
 Put these environment variables to the `.env` file.
 
@@ -138,9 +127,6 @@ Put these environment variables to the `.env` file.
   - `GOOGLE_ADMIN_SAPISID`: The SAPISID value of the cookie you got from Google Calendar
   - `GOOGLE_ADMIN_SAPISID_HASH`: The hash value after the SAPISIDHASH in the Authorization header you got from Google Calendar
   - `GOOGLE_ADMIN_AUTHUSER`: The x-goog-authuser value of the request you got from Google Calendar
-- FreeIPA Server related
-  - `IPA_SERVER_URL`: The URL of your FreeIPA server
-  - `IPA_SERVER_COOKIE`: The `ipa_session` cookie value you got from FreeIPA
 
 ## Usage
 

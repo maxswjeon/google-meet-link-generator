@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import KeycloakProvider from "next-auth/providers/keycloak";
 
 export const authOptions = {
@@ -18,7 +18,19 @@ export const authOptions = {
       },
     }),
   ],
-  debug: true,
-};
+  callbacks: {
+    async jwt({ token, account, profile }) {
+      if (account) {
+        token.google = profile?.google;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.user.google = token.google;
+
+      return session;
+    },
+  },
+} as NextAuthOptions;
 
 export default NextAuth(authOptions);

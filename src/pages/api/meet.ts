@@ -6,7 +6,6 @@ import {
   CalendarListResource,
   CalendarListResponse,
   CreateCalendarEventResponse,
-  IPAUserFindResponse,
 } from "types/Response";
 import { authOptions } from "./auth/[...nextauth]";
 
@@ -50,33 +49,6 @@ export default async function MeetLinkGenerate(
       res.status(400).end();
       return;
     }
-
-    const { data: ipaUser } = await axios.post<IPAUserFindResponse>(
-      `${process.env.IPA_SERVER_URL}/ipa/session/json`,
-      {
-        id: 0,
-        method: "user_find",
-        params: [
-          [null],
-          {
-            all: true,
-            raw: false,
-            version: "2.251",
-            mail: [userMail],
-          },
-        ],
-      },
-      {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Cookie: encodeCookies({
-            ipa_session: process.env.IPA_SERVER_COOKIE,
-          }),
-          Referer: `${process.env.IPA_SERVER_URL}/ipa`,
-        },
-      }
-    );
 
     const key = await JWT.importPKCS8(CREDENTIALS.private_key, "RS256");
 
@@ -286,7 +258,7 @@ export default async function MeetLinkGenerate(
               ["localId_9296729851", "소그룹 세션 2", null, []],
             ],
           ],
-          [[ipaUser.result.result[0].departmentnumber[0]], []],
+          [[session.user.google], []],
           null,
           [],
         ],

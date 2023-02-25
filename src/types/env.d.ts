@@ -16,8 +16,5 @@ declare module NodeJS {
     GOOGLE_ADMIN_SAPISID: string;
     GOOGLE_ADMIN_SAPISID_HASH: string;
     GOOGLE_ADMIN_AUTHUSER: string;
-
-    IPA_SERVER_URL: string;
-    IPA_SERVER_COOKIE: string;
   }
 }
