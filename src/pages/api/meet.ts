@@ -101,10 +101,26 @@ export default async function MeetLinkGenerate(
     ) {
       console.log("Creating new calendar for user");
 
-      const { data } = await axios.post(
+      const { data } = await axios.post<CalendarListResource>(
         "https://www.googleapis.com/calendar/v3/calendars",
         {
-          summary: `스터디 - ${userName} (${userMail.split("@")[0]})`,
+          summary: `${userName} (${userMail.split("@")[0]})`,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+
+      await axios.post(
+        `https://www.googleapis.com/calendar/v3/calendars/${data.id}/acl?sendNotifications=true`,
+        {
+          role: "owner",
+          scope: {
+            type: "user",
+            value: userMail,
+          },
         },
         {
           headers: {
@@ -158,7 +174,7 @@ export default async function MeetLinkGenerate(
             conferenceSolutionKey: {
               type: "hangoutsMeet",
             },
-            requestId: `ycc-study-${Math.random()}`,
+            requestId: `ycc-user-${Math.random()}`,
           },
         },
         recurrence: repeatEnd
